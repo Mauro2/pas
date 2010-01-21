@@ -7,6 +7,8 @@ uses
 const
 	RutaArchivo = 'ZOOMUNDO.DAT';
 	ZooBSAS = 'AARGCBA';
+
+	NumeroInicializar = -999999999;
 	
 	SubIndInf = 1;
 	SubIndSup = 50;
@@ -47,24 +49,24 @@ type
 	
 	
 	
-procedure MostrarError( mensaje: TD_MensajeError )
+procedure MostrarError( mensaje: TD_MensajeError );
 begin
 	writeln( mensaje );
 end;
 	
 { Procedures Vector }
 	
-procedure InicializarVector( var vector: TVec_CodEspExt )
+procedure InicializarVector( var vector: TVec_CodEspExt );
 var
 	i: integer;
 begin
-	for i := SubIndInf to SubIndSup do vector[i] = -999999999;
+	for i := SubIndInf to SubIndSup do vector[i] := NumeroInicializar;
 end;
 
 
 procedure DesplazarElementos( var vector: TVec_CodEspExt;
 							  corriente: integer;
-							  var cantElem: integer )
+							  var cantElem: integer );
 var
 	i: integer;
 	aux: TD_CodEsp;
@@ -81,17 +83,17 @@ begin
 end;
 
 {pre-condicion: Vector inicializado con InicializarVector}
-{TODO: post-condicion: }
+{post-condicion: Inserta en el vector}
 procedure InsertarVector( var vector: TVec_CodEspExt;
 						  var item: TD_CodEsp;
-						  var cantElem: integer )
+						  var cantElem: byte );
 var
 	i: integer;
 	corriente: integer;
 begin
-	if( cantElem <= SubIndSup )
+	if cantElem <= SubIndSup  then
 	begin
-		while item > vector[corriente] and corriente < cantElem do
+		while ( item > vector[corriente]) and (corriente < cantElem ) do
 		begin
 			inc(corriente);
 		end
@@ -100,20 +102,67 @@ begin
 	begin
 		MostrarError( 'Vector lleno, no se pueden insertar mas registros' );
 	end;
-	
-
 end;
 
+{TODO: Hacer Procedimiento}
+procedure InicializarVariables( );
+begin
+	writeln( 'NotImplemented' );
+end;
+
+procedure ProcesarRegistro( item: TR_Zoomundo;
+							var vector: TVec_CodEspExt;
+							var lista: TL_Esp;
+							var cantElem: byte );
+begin
+	if item.CodZoo = ZooBSAS then
+	begin
+		InsertarVector( vector, item.CodEsp, cantElem );
+	end
+	else
+	begin
+		{InsertarLista( lista, item );}
+	end;
+end;
+
+{TODO: pre-condicion:}
+{post-condicion: Recorre el archivo secuencialmente y genera los indices de especies en extincion en 
+		 		 el zoologico de BsAs y los zoologicos en donde se encuentran}
+procedure CrearIndices( var arch: TA_Zoomundo;
+						var vector: TVec_CodEspExt;
+						var	lista: TL_Esp;
+						var	cantElem: byte );
+var
+	auxRec: TR_Zoomundo;
+begin
+	reset( arch );
+	read( arch, auxRec );
+	
+	while not eof( arch ) do
+	begin		
+		ProcesarRegistro( auxRec, vector, lista, cantElem );
+		read( arch, auxRec );
+	end;
+	
+	ProcesarRegistro( auxRec, vector, lista, cantElem );
+
+	close( arch );
+end;
 
 	
 var
+	VectorEsp: TVec_CodEspExt;
 	ListaEsp: TL_Esp;
+	
 	Archivo: TA_Zoomundo;
 	
+	CantElem: byte;
+	
 begin
-	assign(Archivo, RutaArchivo);
+	assign( Archivo, RutaArchivo );
 	
+	InicializarVariables( );
+	CrearIndices( Archivo, VectorEsp, ListaEsp, CantElem );
 	
-	
-	writeln('*** Fin del Programa ***');
+	writeln( '*** Fin del Programa ***' );
 end.
