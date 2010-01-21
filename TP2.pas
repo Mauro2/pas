@@ -91,7 +91,7 @@ begin
 	inc(cantElem);
 end;
 
-{TODO: DEPRECATE, no es necesario que esten en orden en el vector.
+{TODO: DEPRECATE, no es necesario que esten en orden en el vector.}
 {pre-condicion: Vector inicializado con InicializarVector}
 {post-condicion: Inserta en el vector}
 procedure InsertarVector( var vector: TVec_CodEspExt;
@@ -101,19 +101,10 @@ var
 	i: integer;
 	corriente: integer;
 begin
-	if cantElem <= SubIndSup  then
+	if cantElem < SubIndSup  then
 	begin
-		corriente := 1;
-		
-		while ( item > vector[corriente]) and (corriente < cantElem ) do
-		begin
-			inc(corriente);
-		end;
-		
-		writeln( corriente );
-		
-		DesplazarElementos( vector, corriente, cantElem );
-		{vector[corriente] := item;}
+		inc(cantElem);
+		vector[cantElem] := item;
 	end
 	else
 	begin
@@ -145,7 +136,7 @@ begin
 		end
 		else
 		begin
-			InsertarLista( lista, item );
+			{InsertarLista( lista, item );}
 		end;
 	end;
 end;
@@ -180,7 +171,7 @@ end;
 {pre-condicion: Tener las listas con datos de CrearIndices}
 {post-condicion: Busca en las listas que contienen todas las especies en extincion
 				 los animales que no estan en el Zoologico de Buenos Aires}
-procedure Proceso( )
+procedure Proceso( );
 begin
 	writeln( 'Not Implemented' );
 end;
