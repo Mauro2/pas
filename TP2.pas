@@ -110,18 +110,29 @@ begin
 	writeln( 'NotImplemented' );
 end;
 
+function EsEspecieEnExtincion( codEsp: TD_CodEsp ) : boolean;
+begin
+	EsEspecieEnExtincion := codEsp mod 10 = 0;
+end;
+
 procedure ProcesarRegistro( item: TR_Zoomundo;
 							var vector: TVec_CodEspExt;
 							var lista: TL_Esp;
 							var cantElem: byte );
 begin
-	if item.CodZoo = ZooBSAS then
+
+    if EsEspecieEnExtincion( item.CodEsp ) then
 	begin
-		InsertarVector( vector, item.CodEsp, cantElem );
-	end
-	else
-	begin
-		{InsertarLista( lista, item );}
+		
+		if( item.CodZoo = ZooBSAS ) then
+		begin
+			InsertarVector( vector, item.CodEsp, cantElem );
+		end
+		else
+		begin
+			{InsertarLista( lista, item );}
+		end;
+		
 	end;
 end;
 
