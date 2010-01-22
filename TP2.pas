@@ -75,7 +75,7 @@ begin
 	encontrado := false;
 	
 	while ( i <= cantElem )
-	  and ( encontrado := false ) do
+	  and ( encontrado = false ) do
 	begin
 		if vector[i] = item then encontrado := true;
 		
