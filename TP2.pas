@@ -94,7 +94,7 @@ end;
 {TODO: DEPRECATE, no es necesario que esten en orden en el vector.}
 {pre-condicion: Vector inicializado con InicializarVector}
 {post-condicion: Inserta en el vector}
-procedure InsertarVector( var vector: TVec_CodEspExt;
+procedure AgregarVector( var vector: TVec_CodEspExt;
 						  var item: TD_CodEsp;
 						  var cantElem: byte );
 var
@@ -132,7 +132,7 @@ begin
 	begin
 		if item.CodZoo = ZooBSAS then
 		begin
-			InsertarVector( vector, item.CodEsp, cantElem );
+			AgregarVector( vector, item.CodEsp, cantElem );
 		end
 		else
 		begin
@@ -183,12 +183,19 @@ var
 	Archivo: TA_Zoomundo;
 	
 	CantElem: byte;
+	i: integer;
 	
 begin
 	assign( Archivo, RutaArchivo );
 	
 	InicializarVariables( CantElem );
 	CrearIndices( Archivo, VectorEsp, ListaEsp, CantElem );
+	
+	for i := 1 to cantElem do
+	begin
+		writeln( VectorEsp[i] );
+	end;
+	
 	Proceso( );
 	
 	writeln( '*** Fin del Programa ***' );
