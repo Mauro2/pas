@@ -5,7 +5,7 @@ uses
 	dos;
 	
 const
-	RutaArchivo = 'ZOOMUNDO.DAT';
+	RutaArchivo = 'C:\src-git\pas\ZOOMUNDO.DAT';
 	ZooBSAS = 'AARGCBA';
 
 	NumeroInicializar = -999999999;
@@ -63,37 +63,31 @@ begin
 	for i := SubIndInf to SubIndSup do vector[i] := NumeroInicializar;
 end;
 
+function ContieneValor( vector: TVec_CodEspExt;
+						item: TD_CodEsp;
+						cantElem: byte) : boolean;
+var 
+i: integer;
+encontrado: boolean;
 
-procedure DesplazarElementos( var vector: TVec_CodEspExt;
-							  corriente: integer;
-							  var cantElem: byte );
-var
-	i: integer;
-	aux: TD_CodEsp;
 begin
+	i := 1;
+	encontrado := false;
 	
-	{TODO: Revisar}
-	aux := vector[ corriente ];
-	writeln( aux );
-	
-	
-	for i := (corriente + 1) to cantElem do
+	while ( i <= cantElem )
+	  and ( encontrado := false ) do
 	begin
-		vector[i] := aux;
-		aux := vector[i + 1];
+		if vector[i] = item then encontrado := true;
+		
+		inc( i );
 	end;
 	
-	for i := 1 to cantElem do
-	begin
-		write( vector[i], ' - ' );
-	end;
-	
-	inc(cantElem);
-end;
+	ContieneValor := encontrado;
+end;						
 
-{TODO: DEPRECATE, no es necesario que esten en orden en el vector.}
 {pre-condicion: Vector inicializado con InicializarVector}
-{post-condicion: Inserta en el vector}
+{post-condicion: Agrega valores al final del vector, 
+				 si no puede agregar mas muestra un mensaje de error}
 procedure AgregarVector( var vector: TVec_CodEspExt;
 						  var item: TD_CodEsp;
 						  var cantElem: byte );
