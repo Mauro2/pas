@@ -54,7 +54,7 @@ begin
 	writeln( mensaje );
 end;
 	
-{ Procedures Vector }
+{********************* Comienzo Procedures / Funciones del Vector *********************}
 	
 procedure InicializarVector( var vector: TVec_CodEspExt );
 var
@@ -102,7 +102,7 @@ begin
 	end
 	else
 	begin
-		alert( 'Vector lleno, no se pueden insertar mas registros' );
+		alert( 'Vector lleno, no se pueden agregar mas registros' );
 	end;
 end;
 
@@ -111,6 +111,24 @@ procedure InicializarVariables( var cantElem: byte );
 begin
 	cantElem := 0;
 end;
+
+{********************* Fin Procedures / Funciones del Vector *********************}
+
+
+
+
+{********************* Comienzo Procedures / Funciones de la lista *********************}
+
+
+
+
+
+
+
+
+
+{********************* Fin Procedures / Funciones de la lista *********************}
+
 
 function EsEspecieEnExtincion( codEsp: TD_CodEsp ) : boolean;
 begin
@@ -167,7 +185,7 @@ end;
 				 los animales que no estan en el Zoologico de Buenos Aires}
 procedure Proceso( );
 begin
-	writeln( 'Not Implemented' );
+	writeln( 'function Proceso - Not Implemented' );
 end;
 
 var
