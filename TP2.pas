@@ -34,7 +34,7 @@ type
 	TL_Zoo = TN_Zoo;
 	
 	TR_Zoo = record
-				CodZoologico: TD_CodZoo;
+				CodZoo: TD_CodZoo;
 				Siguiente: TN_Zoo;
 			 end;
 				
@@ -42,12 +42,10 @@ type
 	TL_Esp = TN_Esp;
 	
 	TR_Esp = record
-				CodEspecie: TD_CodEsp;
+				CodEsp: TD_CodEsp;
 				ListaZoo: TL_Zoo;
 				Siguiente: TN_Esp;
 			 end;
-	
-	
 	
 procedure alert( mensaje: TD_Alert );
 begin
@@ -106,12 +104,6 @@ begin
 	end;
 end;
 
-{TODO: Hacer Procedimiento}
-procedure InicializarVariables( var cantElem: byte );
-begin
-	cantElem := 0;
-end;
-
 {********************* Fin Procedures / Funciones del Vector *********************}
 
 
@@ -119,16 +111,112 @@ end;
 
 {********************* Comienzo Procedures / Funciones de la lista *********************}
 
+{Lista TL_Zoo}
+
+procedure CrearLista( var lista: TL_Zoo );
+begin
+	lista := nil;
+end;
+
+function ListaVacia( var lista: TL_Zoo ) : boolean;
+begin
+	ListaVacia := lista = nil;
+end;
+
+function Primero( lista: TL_Zoo ) : TN_Zoo;
+begin
+	Primero := lista;
+end;
+
+function Siguiente( nodo: TN_Zoo;
+					var lista: TL_Zoo ) : TN_Zoo;
+begin
+	Siguiente := nodo^.Siguiente;
+end;
+
+procedure CrearNodo( info: TD_CodZoo;
+					 var nodo: TN_Zoo );
+begin
+	new( nodo );
+	
+	nodo^.CodZoo := info;
+	nodo^.Siguiente := nil;
+end;
+
+procedure AgregarPrincipio( var lista: TL_Zoo;
+							info: TD_CodZoo;
+							var nuevoNodo: TN_Zoo);
+begin
+	CrearNodo( info, nuevoNodo );
+
+	nuevoNodo^.Siguiente := lista;
+	lista := nuevoNodo;
+end;
+
+{/Lista TL_Zoo}
+
+{Lista TL_Esp}
+
+procedure CrearLista( var lista: TL_Esp );
+begin
+	lista := nil;
+end;
+
+function ListaVacia( var lista: TL_Esp ) : boolean;
+begin
+	ListaVacia := lista = nil;
+end;
+
+function Siguiente( nodo: TN_Esp;
+					var lista: TL_Esp ) : TN_Esp;
+begin
+	Siguiente := nodo^.Siguiente;
+end;
+
+procedure CrearNodo( info: TD_CodEsp;
+					 var nodo: TN_Esp );
+begin
+	new( nodo );
+	
+	nodo^.CodEsp  := info;
+	nodo^.ListaZoo := nil;
+	nodo^.Siguiente := nil;
+end;
+
+procedure Insertar( info: TD_CodEsp;
+					lista: TL_Esp;
+					nodo: TN_Esp );
+begin
 
 
+end;
 
+procedure AgregarLista( info: TR_Zoomundo;
+						listaEsp: TL_Esp );
+var
+	nodoEsp: TN_Esp;
+	nodoZoo: TN_Zoo;
+begin
+	{nodoEsp := LocalizarDato( info, listaEsp );}
+	
+	if nodoEsp = nil then
+	begin
+		Insertar( info.CodEsp, listaEsp, nodoEsp );
+	end;
+	
+	AgregarPrincipio( nodoEsp^.ListaZoo, info.CodZoo, nodoZoo );
+	
+end;
 
-
-
-
+{/Lista TL_Esp}
 
 {********************* Fin Procedures / Funciones de la lista *********************}
 
+{TODO: Hacer Procedimiento}
+procedure InicializarVariables( var cantElem: byte );
+begin
+	cantElem := 0;
+end;
 
 function EsEspecieEnExtincion( codEsp: TD_CodEsp ) : boolean;
 begin
@@ -148,7 +236,7 @@ begin
 		end
 		else
 		begin
-			{InsertarLista( lista, item );}
+			AgregarLista( item, lista );
 		end;
 	end;
 end;
