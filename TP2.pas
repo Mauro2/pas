@@ -6,17 +6,21 @@ uses
 	
 const
 	RutaArchivo = 'ZOOMUNDO.DAT';
+	RutaArchivoSalida = 'ZOOOUT.DAT';
 	ZooBSAS = 'AARGCBA';
 
 	NumeroInicializar = -999999999;
 	
 	SubIndInf = 1;
 	SubIndSup = 50;
-
+	
+	CR = #13;
+	LF = #10;
 type
 	TD_CodZoo = string[7]; { 8 bytes }
 	TD_CodEsp = longint;
 	TD_Alert = string[100];
+	TD_TipoContinente = string[10];
 	
 	TVec_CodEspExt = array[SubIndInf..SubIndSup] of TD_CodEsp;
 	
@@ -29,7 +33,7 @@ type
 				  end;
 	
 	TA_Zoomundo = file of TR_Zoomundo;
-	
+	TA_ZooOut = text;
 	{Declaracion de Lista Zoologico}
 	TL_Zoo = TN_Zoo;
 	
@@ -46,6 +50,11 @@ type
 				ListaZoo: TL_Zoo;
 				Siguiente: TN_Esp;
 			 end;
+	
+function NuevaLinea( ) : string;
+begin
+	NuevaLinea := CR + LF;
+end;
 	
 procedure alert( mensaje: TD_Alert );
 begin
@@ -243,15 +252,6 @@ begin
 		nodo^.Siguiente := nodoPrevio^.Siguiente;
 		nodoPrevio^.Siguiente := nodo;
 	end;
-	
-	nodoCursor := Primero( lista );
-	writeln( 'Lista Especies: ');
-	while nodoCursor <> nil do
-	begin
-		writeln(nodoCursor = nil);
-		nodoCursor := Siguiente( nodoCursor, lista );
-	end;
-	
 end;
 
 procedure AgregarLista( info: TR_Zoomundo;
@@ -265,10 +265,9 @@ begin
 	if nodoEsp = nil then
 	begin
 		Insertar( info.CodEsp, listaEsp, nodoEsp );
-		alert( 'Inserto' );
 	end;
 	
-	{AgregarPrincipio( nodoEsp^.ListaZoo, info.CodZoo, nodoZoo );}
+	AgregarPrincipio( nodoEsp^.ListaZoo, info.CodZoo, nodoZoo );
 end;
 
 {/Lista TL_Esp}
@@ -332,12 +331,65 @@ begin
 	close( arch );
 end;
 
+procedure ImprimirEncabezado( codEsp: TD_CodEsp;
+							  var arch: TA_ZooOut );
+begin
+	writeln( arch, ' ':5, 'Codigo de especie en extincion: ', codEsp );
+	writeln( arch, ' ':10, 'Codigo de zoologico con especie existente', ' ':10, 'Continente' );
+end;
+
+function NombreContinente( cadena: TD_CodZoo ) : TD_TipoContinente;
+var
+	aux: char;
+begin
+	aux := upcase(cadena)[1];
+	
+	case aux of
+		'A':
+			NombreContinente := 'America';
+		
+		'F':
+			NombreContinente := 'Africa';
+		
+		'E':
+			NombreContinente := 'Europa';
+			
+		'S':
+			NombreContinete := 'Asia';
+		
+		'O':
+			NombreContinente := 'Oceania';
+			
+		otherwise
+			NombreContinente := 'NoCont';
+	end;
+end;
+
 {pre-condicion: Tener las listas con datos de CrearIndices}
 {post-condicion: Busca en las listas que contienen todas las especies en extincion
 				 los animales que no estan en el Zoologico de Buenos Aires}
-procedure Proceso( );
+procedure Proceso( var arch: TA_ZooOut;
+				   var vector: TVec_CodEspExt;
+				   var lista: TL_Esp;
+				   var cantElem: byte );
+				   
+var
+	ptrCursorEsp: TN_Esp;
+	
 begin
-	writeln( 'function Proceso - Not Implemented' );
+	rewrite( arch );
+	ptrCursorEsp := Primero( lista );
+	
+	writeln( arch, ' ':15, 'Faltantes de especies en EXTINCION del Zoologico de la Ciudad de Bs. As.', NuevaLinea() );
+	
+	ImprimirEncabezado( 2222, arch );
+	
+	while ptrCursorEsp <> nil do
+	begin
+		
+	end;
+	
+	close( arch );
 end;
 
 var
@@ -345,17 +397,25 @@ var
 	ListaEsp: TL_Esp;
 	
 	Archivo: TA_Zoomundo;
+	ArchivoSalida: TA_ZooOut;
 	
 	CantElem: byte;
 	i: integer;
 	
 begin
 	assign( Archivo, RutaArchivo );
+	assign( ArchivoSalida, RutaArchivoSalida );
+	
+	alert( NombreContinente( 'AAAA' ) );
+	
+	alert( NombreContinente( 'FAAA' ) );
+	
+	alert( NombreContinente( '4AAA' ) );
 	
 	InicializarVariables( CantElem );
-	CrearIndices( Archivo, VectorEsp, ListaEsp, CantElem );
+	{CrearIndices( Archivo, VectorEsp, ListaEsp, CantElem );}
 		
-	Proceso( );
+	Proceso( ArchivoSalida, VectorEsp, ListaEsp, CantElem );
 	
 	writeln( '*** Fin del Programa ***' );
 end.
