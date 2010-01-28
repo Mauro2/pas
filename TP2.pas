@@ -5,7 +5,7 @@ uses
 	dos;
 	
 const
-	RutaArchivo = 'C:\src-git\pas\ZOOMUNDO.DAT';
+	RutaArchivo = 'ZOOMUNDO.DAT';
 	ZooBSAS = 'AARGCBA';
 
 	NumeroInicializar = -999999999;
@@ -167,6 +167,11 @@ begin
 	ListaVacia := lista = nil;
 end;
 
+function Primero( var lista: TL_Esp ) : TN_Esp;
+begin
+	Primero := lista;
+end;
+
 function Siguiente( nodo: TN_Esp;
 					var lista: TL_Esp ) : TN_Esp;
 begin
@@ -183,21 +188,72 @@ begin
 	nodo^.Siguiente := nil;
 end;
 
-procedure Insertar( info: TD_CodEsp;
-					lista: TL_Esp;
-					nodo: TN_Esp );
+procedure AgregarPrincipio( item: TD_CodEsp;
+							var lista: TL_Esp;
+							var nodo: TN_Esp );
 begin
+	CrearNodo( item, nodo );
+	
+	if nodo <> nil then
+	begin
+		nodo^.Siguiente := lista;
+		lista := nodo;
+	end;
+end;
 
+procedure LocalizarDato( item: TD_CodEsp;
+						 lista: TL_Esp;
+						 var nodo: TN_Esp);
 
+begin
+	nodo := Primero( lista );
+	
+	while (nodo <> nil) and (item <> nodo^.CodEsp) do
+	begin
+		nodo := Siguiente( nodo, lista );
+	end;
+end;
+
+procedure Insertar( info: TD_CodEsp;
+					var lista: TL_Esp;
+					var nodo: TN_Esp );
+var
+	nodoPrevio, nodoCursor: TN_Esp;
+
+begin
+	CrearNodo( info, nodo );
+	
+	if ListaVacia( lista ) then
+	begin
+		writeln(lista = nil);
+		AgregarPrincipio( info, lista, nodo );
+		writeln(lista^.CodEsp);
+	end
+	else if nodo <> nil then
+	begin
+		writeln( lista^.CodEsp );
+		nodoPrevio := Primero( lista );
+		nodoCursor := nodoPrevio^.Siguiente;
+		
+		while (nodoCursor <> nil) and (nodoCursor^.CodEsp < info) do
+		begin
+			nodoPrevio := nodoCursor;
+			nodoCursor := Siguiente( nodoCursor, Lista );
+		end;
+		
+		nodo^.Siguiente := nodoPrevio;
+		nodoPrevio^.Siguiente := nodo;
+	end;
 end;
 
 procedure AgregarLista( info: TR_Zoomundo;
-						listaEsp: TL_Esp );
+						var listaEsp: TL_Esp );
 var
 	nodoEsp: TN_Esp;
 	nodoZoo: TN_Zoo;
 begin
-	{nodoEsp := LocalizarDato( info, listaEsp );}
+	
+	LocalizarDato( info.CodEsp, listaEsp, nodoEsp );
 	
 	if nodoEsp = nil then
 	begin
@@ -205,7 +261,6 @@ begin
 	end;
 	
 	AgregarPrincipio( nodoEsp^.ListaZoo, info.CodZoo, nodoZoo );
-	
 end;
 
 {/Lista TL_Esp}
@@ -232,10 +287,13 @@ begin
 	begin
 		if item.CodZoo = ZooBSAS then
 		begin
+			writeln( item.CodZoo, item.CodEsp );
 			AgregarVector( vector, item.CodEsp, cantElem );
+			writeln( item.CodEsp );
 		end
 		else
 		begin
+			writeln( 'Hay que agregar' );
 			AgregarLista( item, lista );
 		end;
 	end;
@@ -251,6 +309,8 @@ procedure CrearIndices( var arch: TA_Zoomundo;
 						var	cantElem: byte );
 var
 	auxRec: TR_Zoomundo;
+	cursor: TN_Esp;
+	i: integer;
 	
 begin
 	reset( arch );
@@ -265,6 +325,22 @@ begin
 	
 	ProcesarRegistro( auxRec, vector, lista, cantElem );
 
+	{TODO: Borrar}
+	cursor := Primero( lista );
+	
+	writeln( 'Lista Especies: ', cursor <> nil );
+	while cursor <> nil do
+	begin
+		writeln(cursor^.CodEsp);
+		cursor := cursor^.Siguiente;
+	end;
+	
+	writeln( 'Vector Especies en extincion existentes en el zoologico: ' );
+	for i := SubIndInf to cantElem do
+	begin
+		writeln(vector[i]);	
+	end;
+	
 	close( arch );
 end;
 
@@ -290,12 +366,7 @@ begin
 	
 	InicializarVariables( CantElem );
 	CrearIndices( Archivo, VectorEsp, ListaEsp, CantElem );
-	
-	for i := 1 to cantElem do
-	begin
-		writeln( VectorEsp[i] );
-	end;
-	
+		
 	Proceso( );
 	
 	writeln( '*** Fin del Programa ***' );
