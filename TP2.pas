@@ -50,6 +50,7 @@ type
 procedure alert( mensaje: TD_Alert );
 begin
 	writeln( mensaje );
+	readln();
 end;
 	
 {********************* Comienzo Procedures / Funciones del Vector *********************}
@@ -223,27 +224,34 @@ var
 begin
 	CrearNodo( info, nodo );
 	
-	if ListaVacia( lista ) then
+	if ( ListaVacia( lista ) )
+		or ( ( not ListaVacia( lista ) ) and ( info < Primero( lista )^.CodEsp ) ) then
 	begin
-		writeln(lista = nil);
 		AgregarPrincipio( info, lista, nodo );
-		writeln(lista^.CodEsp);
 	end
 	else if nodo <> nil then
 	begin
-		writeln( lista^.CodEsp );
 		nodoPrevio := Primero( lista );
 		nodoCursor := nodoPrevio^.Siguiente;
 		
-		while (nodoCursor <> nil) and (nodoCursor^.CodEsp < info) do
+		while( nodoCursor <> nil ) and ( nodoCursor^.CodEsp < info ) do
 		begin
 			nodoPrevio := nodoCursor;
-			nodoCursor := Siguiente( nodoCursor, Lista );
+			nodoCursor := Siguiente( nodoCursor, lista );
 		end;
 		
-		nodo^.Siguiente := nodoPrevio;
+		nodo^.Siguiente := nodoPrevio^.Siguiente;
 		nodoPrevio^.Siguiente := nodo;
 	end;
+	
+	nodoCursor := Primero( lista );
+	writeln( 'Lista Especies: ');
+	while nodoCursor <> nil do
+	begin
+		writeln(nodoCursor = nil);
+		nodoCursor := Siguiente( nodoCursor, lista );
+	end;
+	
 end;
 
 procedure AgregarLista( info: TR_Zoomundo;
@@ -252,15 +260,15 @@ var
 	nodoEsp: TN_Esp;
 	nodoZoo: TN_Zoo;
 begin
-	
 	LocalizarDato( info.CodEsp, listaEsp, nodoEsp );
 	
 	if nodoEsp = nil then
 	begin
 		Insertar( info.CodEsp, listaEsp, nodoEsp );
+		alert( 'Inserto' );
 	end;
 	
-	AgregarPrincipio( nodoEsp^.ListaZoo, info.CodZoo, nodoZoo );
+	{AgregarPrincipio( nodoEsp^.ListaZoo, info.CodZoo, nodoZoo );}
 end;
 
 {/Lista TL_Esp}
@@ -287,13 +295,10 @@ begin
 	begin
 		if item.CodZoo = ZooBSAS then
 		begin
-			writeln( item.CodZoo, item.CodEsp );
 			AgregarVector( vector, item.CodEsp, cantElem );
-			writeln( item.CodEsp );
 		end
 		else
 		begin
-			writeln( 'Hay que agregar' );
 			AgregarLista( item, lista );
 		end;
 	end;
@@ -319,28 +324,11 @@ begin
 	while not eof( arch ) do
 	begin		
 		ProcesarRegistro( auxRec, vector, lista, cantElem );
-		
 		read( arch, auxRec );
 	end;
 	
 	ProcesarRegistro( auxRec, vector, lista, cantElem );
 
-	{TODO: Borrar}
-	cursor := Primero( lista );
-	
-	writeln( 'Lista Especies: ', cursor <> nil );
-	while cursor <> nil do
-	begin
-		writeln(cursor^.CodEsp);
-		cursor := cursor^.Siguiente;
-	end;
-	
-	writeln( 'Vector Especies en extincion existentes en el zoologico: ' );
-	for i := SubIndInf to cantElem do
-	begin
-		writeln(vector[i]);	
-	end;
-	
 	close( arch );
 end;
 
