@@ -334,7 +334,7 @@ end;
 procedure ImprimirEncabezado( codEsp: TD_CodEsp;
 							  var arch: TA_ZooOut );
 begin
-	writeln( arch, ' ':5, 'Codigo de especie en extincion: ', codEsp );
+	writeln( arch, NuevaLinea(), ' ':5, 'Codigo de especie en extincion: ', codEsp );
 	writeln( arch, ' ':10, 'Codigo de zoologico con especie existente', ' ':10, 'Continente' );
 end;
 
@@ -355,7 +355,7 @@ begin
 			NombreContinente := 'Europa';
 			
 		'S':
-			NombreContinete := 'Asia';
+			NombreContinente := 'Asia';
 		
 		'O':
 			NombreContinente := 'Oceania';
@@ -375,6 +375,7 @@ procedure Proceso( var arch: TA_ZooOut;
 				   
 var
 	ptrCursorEsp: TN_Esp;
+	ptrCursorZoo: TN_Zoo;
 	
 begin
 	rewrite( arch );
@@ -382,11 +383,24 @@ begin
 	
 	writeln( arch, ' ':15, 'Faltantes de especies en EXTINCION del Zoologico de la Ciudad de Bs. As.', NuevaLinea() );
 	
-	ImprimirEncabezado( 2222, arch );
-	
 	while ptrCursorEsp <> nil do
 	begin
+		if not ContieneValor( vector, ptrCursorEsp^.CodEsp, cantElem ) then
+		begin
+			ImprimirEncabezado( ptrCursorEsp^.CodEsp, arch );
+			
+			ptrCursorZoo := Primero( ptrCursorEsp^.ListaZoo );
+			
+			while ptrCursorZoo <> nil do
+			begin
+				writeln( arch, ' ': 15, ptrCursorZoo^.CodZoo, ' ': 40, NombreContinente(  ptrCursorZoo^.CodZoo ) );				
+				
+				ptrCursorZoo := Siguiente( ptrCursorZoo, ptrCursorEsp^.ListaZoo );
+			end;
+			
+		end;
 		
+		ptrCursorEsp := ptrCursorEsp^.Siguiente;		
 	end;
 	
 	close( arch );
@@ -406,14 +420,8 @@ begin
 	assign( Archivo, RutaArchivo );
 	assign( ArchivoSalida, RutaArchivoSalida );
 	
-	alert( NombreContinente( 'AAAA' ) );
-	
-	alert( NombreContinente( 'FAAA' ) );
-	
-	alert( NombreContinente( '4AAA' ) );
-	
 	InicializarVariables( CantElem );
-	{CrearIndices( Archivo, VectorEsp, ListaEsp, CantElem );}
+	CrearIndices( Archivo, VectorEsp, ListaEsp, CantElem );
 		
 	Proceso( ArchivoSalida, VectorEsp, ListaEsp, CantElem );
 	
