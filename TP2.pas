@@ -3,14 +3,14 @@ program Zoologico;
 uses
 	crt,
 	dos;
-	
+
 const
-	RutaArchivo = 'ZOOMUNDO.DAT';
-	RutaArchivoSalida = 'ZOOOUT.DAT';
+	RutaArchivo = 'C:\tp2\pas\ZOOMUNDO.DAT';
+	RutaArchivoSalida = 'C:\tp2\pas\ZOOOUT.DAT';
 	ZooBSAS = 'AARGCBA';
 
 	NumeroInicializar = -999999999;
-	
+
 	SubIndInf = 1;
 	SubIndSup = 50;
 	
@@ -51,7 +51,7 @@ type
 				Siguiente: TN_Esp;
 			 end;
 	
-function NuevaLinea( ) : string;
+function NuevaLinea : string;
 begin
 	NuevaLinea := CR + LF;
 end;
@@ -59,12 +59,14 @@ end;
 procedure alert( mensaje: TD_Alert );
 begin
 	writeln( mensaje );
-	readln();
+	readln;
 end;
 	
 {********************* Comienzo Procedures / Funciones del Vector *********************}
 	
 procedure InicializarVector( var vector: TVec_CodEspExt );
+{pre-condicion: Recibe el vector}
+{post-condicion: Devuelve el vector inicializado con un numero muy bajo}
 var
 	i: integer;
 begin
@@ -74,6 +76,9 @@ end;
 function ContieneValor( vector: TVec_CodEspExt;
 						item: TD_CodEsp;
 						cantElem: byte) : boolean;
+{pre-condicion: - Vector inicalizado y cargado.
+				- Item debe ser un Codigo de Especie Valido}
+{post-condicion: Devuelve un valor booleano que indica si el valor que contiene item se encuentra en el vector}				
 var 
 i: integer;
 encontrado: boolean;
@@ -93,12 +98,12 @@ begin
 	ContieneValor := encontrado;
 end;						
 
-{pre-condicion: Vector inicializado con InicializarVector}
-{post-condicion: Agrega valores al final del vector, 
-				 si no puede agregar mas muestra un mensaje de error}
 procedure AgregarVector( var vector: TVec_CodEspExt;
 						  var item: TD_CodEsp;
 						  var cantElem: byte );
+{pre-condicion: - Vector inicalizado y cargado.
+				- Item debe ser un Codigo de Especie Valido}
+{post-condicion: Agrega valores al final del vector, si no puede agregar mas muestra un mensaje de error}						  
 var
 	i: integer;
 	corriente: integer;
@@ -109,43 +114,41 @@ begin
 		vector[cantElem] := item;
 	end
 	else
-	begin
 		alert( 'Vector lleno, no se pueden agregar mas registros' );
-	end;
 end;
 
 {********************* Fin Procedures / Funciones del Vector *********************}
-
-
-
 
 {********************* Comienzo Procedures / Funciones de la lista *********************}
 
 {Lista TL_Zoo}
 
-procedure CrearLista( var lista: TL_Zoo );
+procedure InicializarListaZoo( var lista: TL_Zoo );
+{post-condicion: Devuelve la lista creada y vacia}
 begin
 	lista := nil;
 end;
 
-function ListaVacia( var lista: TL_Zoo ) : boolean;
+function PrimeroZoo( lista: TL_Zoo ) : TN_Zoo;
+{pre-condicion: Lista inicializada y creada.}
+{post-condicion: Devuelve el nodo del primer elemento de la lista.}
 begin
-	ListaVacia := lista = nil;
+	PrimeroZoo := lista;
 end;
 
-function Primero( lista: TL_Zoo ) : TN_Zoo;
+function SiguienteZoo( nodo: TN_Zoo;
+					   var lista: TL_Zoo ) : TN_Zoo;
+{pre-condicion: - Lista inicializada y creada.
+				- Nodo debe pertenecer a la lista.}
+{post-condicion: Devuelve el nodo siguiente al ingresado.}
 begin
-	Primero := lista;
+	SiguienteZoo := nodo^.Siguiente;
 end;
 
-function Siguiente( nodo: TN_Zoo;
-					var lista: TL_Zoo ) : TN_Zoo;
-begin
-	Siguiente := nodo^.Siguiente;
-end;
-
-procedure CrearNodo( info: TD_CodZoo;
-					 var nodo: TN_Zoo );
+procedure CrearNodoZoo( info: TD_CodZoo;
+					    var nodo: TN_Zoo );
+{pre-condicion: Info debe ser un Codigo de Zoologico valido.}
+{post-condicion: Devuelve un nodo nuevo creado con Codigo Zoologico en info y nil en Siguiente}
 begin
 	new( nodo );
 	
@@ -153,11 +156,13 @@ begin
 	nodo^.Siguiente := nil;
 end;
 
-procedure AgregarPrincipio( var lista: TL_Zoo;
+procedure AgregarPrincipioZoo( var lista: TL_Zoo;
 							info: TD_CodZoo;
 							var nuevoNodo: TN_Zoo);
+{pre-condicion: Info debe ser un Codigo de Zoologico valido.}
+{post-condicion: Devuelve un nodo nuevo creado con Codigo Zoologico en info y lo agrega al principio de la lista}
 begin
-	CrearNodo( info, nuevoNodo );
+	CrearNodoZoo( info, nuevoNodo );
 
 	nuevoNodo^.Siguiente := lista;
 	lista := nuevoNodo;
@@ -167,42 +172,54 @@ end;
 
 {Lista TL_Esp}
 
-procedure CrearLista( var lista: TL_Esp );
+procedure InicializarListaEsp( var lista: TL_Esp );
+{post-condicion: Devuelve la lista creada y vacia}
 begin
 	lista := nil;
 end;
 
-function ListaVacia( var lista: TL_Esp ) : boolean;
+function ListaVaciaEsp( var lista: TL_Esp ) : boolean;
+{pre-condicion: Lista inicializada.}
+{post-condicion: Devuelve un booleando indicando si la lista esta vacia.}
 begin
-	ListaVacia := lista = nil;
+	ListaVaciaEsp := lista = nil;
 end;
 
-function Primero( var lista: TL_Esp ) : TN_Esp;
+function PrimeroEsp( var lista: TL_Esp ) : TN_Esp;
+{pre-condicion: Lista inicializada y creada.}
+{post-condicion: Devuelve el nodo del primer elemento de la lista.}
 begin
-	Primero := lista;
+	PrimeroEsp := lista;
 end;
 
-function Siguiente( nodo: TN_Esp;
-					var lista: TL_Esp ) : TN_Esp;
+function SiguienteEsp( nodo: TN_Esp;
+					   var lista: TL_Esp ) : TN_Esp;
+{pre-condicion: - Lista inicializada y creada.
+				- Nodo debe pertenecer a la lista.}
+{post-condicion: Devuelve el nodo siguiente al ingresado.}
 begin
-	Siguiente := nodo^.Siguiente;
+	SiguienteEsp := nodo^.Siguiente;
 end;
 
-procedure CrearNodo( info: TD_CodEsp;
-					 var nodo: TN_Esp );
+procedure CrearNodoEsp( info: TD_CodEsp;
+						var nodo: TN_Esp );
+{pre-condicion: Info debe ser un Codigo de Especie valido.}
+{post-condicion: Devuelve un nodo nuevo creado con Codigo Especie en info y nil en Siguiente.}
 begin
 	new( nodo );
 	
 	nodo^.CodEsp  := info;
-	nodo^.ListaZoo := nil;
+	InicializarListaZoo( nodo^.ListaZoo );
 	nodo^.Siguiente := nil;
 end;
 
-procedure AgregarPrincipio( item: TD_CodEsp;
-							var lista: TL_Esp;
-							var nodo: TN_Esp );
+procedure AgregarPrincipioEsp( item: TD_CodEsp;
+							   var lista: TL_Esp;
+							   var nodo: TN_Esp );
+{pre-condicion: Info debe ser un Codigo de Zoologico valido.}
+{post-condicion: Devuelve un nodo nuevo creado con Codigo Zoologico en info y lo agrega al principio de la lista.}
 begin
-	CrearNodo( item, nodo );
+	CrearNodoEsp( item, nodo );
 	
 	if nodo <> nil then
 	begin
@@ -211,42 +228,46 @@ begin
 	end;
 end;
 
-procedure LocalizarDato( item: TD_CodEsp;
-						 lista: TL_Esp;
-						 var nodo: TN_Esp);
-
+procedure LocalizarDatoEsp( item: TD_CodEsp;
+							lista: TL_Esp;
+							var nodo: TN_Esp);
+{pre-condicion: Info debe ser un Codigo de Zoologico valido.}
+{post-condicion: Devuelve un nodo nuevo creado con Codigo Zoologico en info y lo agrega al principio de la lista.}
 begin
-	nodo := Primero( lista );
+	nodo := PrimeroEsp( lista );
 	
 	while (nodo <> nil) and (item <> nodo^.CodEsp) do
 	begin
-		nodo := Siguiente( nodo, lista );
+		nodo := SiguienteEsp( nodo, lista );
 	end;
 end;
 
-procedure Insertar( info: TD_CodEsp;
-					var lista: TL_Esp;
-					var nodo: TN_Esp );
+procedure InsertarEsp( info: TD_CodEsp;
+					   var lista: TL_Esp;
+					   var nodo: TN_Esp );
+{pre-condicion: - Lista debe ser inicializada
+				- Info debe ser un Codigo de Especie valido.}
+{post-condicion: Devuelve un nodo nuevo creado con Codigo Especie en info y lo inserta en la lista.}
 var
 	nodoPrevio, nodoCursor: TN_Esp;
 
 begin
-	CrearNodo( info, nodo );
+	CrearNodoEsp( info, nodo );
 	
-	if ( ListaVacia( lista ) )
-		or ( ( not ListaVacia( lista ) ) and ( info < Primero( lista )^.CodEsp ) ) then
+	if ( ListaVaciaEsp( lista ) )
+		or ( ( not ListaVaciaEsp( lista ) ) and ( info < PrimeroEsp( lista )^.CodEsp ) ) then
 	begin
-		AgregarPrincipio( info, lista, nodo );
+		AgregarPrincipioEsp( info, lista, nodo );
 	end
 	else if nodo <> nil then
 	begin
-		nodoPrevio := Primero( lista );
+		nodoPrevio := PrimeroEsp( lista );
 		nodoCursor := nodoPrevio^.Siguiente;
-		
+
 		while( nodoCursor <> nil ) and ( nodoCursor^.CodEsp < info ) do
 		begin
 			nodoPrevio := nodoCursor;
-			nodoCursor := Siguiente( nodoCursor, lista );
+			nodoCursor := SiguienteEsp( nodoCursor, lista );
 		end;
 		
 		nodo^.Siguiente := nodoPrevio^.Siguiente;
@@ -255,32 +276,38 @@ begin
 end;
 
 procedure AgregarLista( info: TR_Zoomundo;
-						var listaEsp: TL_Esp );
+						   var listaEsp: TL_Esp );
+{pre-condicion: - Lista debe ser inicializada.
+				- Info debe ser un registro del archivo valido.}
+{post-condicion: Si encuentra un nodo con el codigo de especie del registro, agrega el codigo de Zoologico a la ListaZoo,
+				 de no existir, lo inserta en la lista.}
 var
 	nodoEsp: TN_Esp;
 	nodoZoo: TN_Zoo;
 begin
-	LocalizarDato( info.CodEsp, listaEsp, nodoEsp );
+	LocalizarDatoEsp( info.CodEsp, listaEsp, nodoEsp );
 	
 	if nodoEsp = nil then
 	begin
-		Insertar( info.CodEsp, listaEsp, nodoEsp );
+		InsertarEsp( info.CodEsp, listaEsp, nodoEsp );
 	end;
 	
-	AgregarPrincipio( nodoEsp^.ListaZoo, info.CodZoo, nodoZoo );
+	AgregarPrincipioZoo( nodoEsp^.ListaZoo, info.CodZoo, nodoZoo );
 end;
 
 {/Lista TL_Esp}
 
 {********************* Fin Procedures / Funciones de la lista *********************}
 
-{TODO: Hacer Procedimiento}
 procedure InicializarVariables( var cantElem: byte );
+{post-condicion: Devuelve las variables inicializadas.}
 begin
 	cantElem := 0;
 end;
 
 function EsEspecieEnExtincion( codEsp: TD_CodEsp ) : boolean;
+{pre-condicion: Codigo de Especie valido.}
+{post-condicion: Devuelve un booleano indicando si es una especie en extincion.}
 begin
 	EsEspecieEnExtincion := codEsp mod 10 = 0;
 end;
@@ -289,6 +316,8 @@ procedure ProcesarRegistro( item: TR_Zoomundo;
 							var vector: TVec_CodEspExt;
 							var lista: TL_Esp;
 							var cantElem: byte );
+{pre-condicion: Codigo de Especie valido.}
+{post-condicion: Devuelve un booleano indicando si es una especie en extincion.}
 begin
     if EsEspecieEnExtincion( item.CodEsp ) then
 	begin
@@ -303,19 +332,20 @@ begin
 	end;
 end;
 
-{TODO: pre-condicion:}
-{post-condicion: Recorre el archivo secuencialmente y genera un vector de especies en extincion 
-				 ya existentes en el zoologico de BsAs y una lista de listas con todas las especies en extincion
-				 y los zoologicos en donde se encuentran (excepto en Buenos Aires)}
-procedure CrearIndices( var arch: TA_Zoomundo;
+procedure ProcesarArchivo( var arch: TA_Zoomundo;
 						var vector: TVec_CodEspExt;
 						var	lista: TL_Esp;
 						var	cantElem: byte );
+{pre-condicion: - Archivo asignado.
+				- Vector y Lista inicializados.}
+{post-condicion: Recorre el archivo secuencialmente y genera un vector de especies en extincion
+				 ya existentes en el zoologico de BsAs y una lista de listas con todas las especies en extincion
+				 y los zoologicos en donde se encuentran (excepto en Buenos Aires)}
 var
 	auxRec: TR_Zoomundo;
 	cursor: TN_Esp;
 	i: integer;
-	
+
 begin
 	reset( arch );
 	read( arch, auxRec );
@@ -333,55 +363,58 @@ end;
 
 procedure ImprimirEncabezado( codEsp: TD_CodEsp;
 							  var arch: TA_ZooOut );
+{pre-condicion: - Archivo Inicializado.
+				- Codigo de especie valido.}
+{post-condicion: Devuelve el encabezado por cada codigo de Especie.}
 begin
-	writeln( arch, NuevaLinea(), ' ':5, 'Codigo de especie en extincion: ', codEsp );
+	writeln( arch, NuevaLinea, ' ':5, 'Codigo de especie en extincion: ', codEsp );
 	writeln( arch, ' ':10, 'Codigo de zoologico con especie existente', ' ':10, 'Continente' );
 end;
 
 function NombreContinente( cadena: TD_CodZoo ) : TD_TipoContinente;
+{NOTA: Funcion desarrollada solo para hacer pruebas}
 var
 	aux: char;
 begin
-	aux := upcase(cadena)[1];
-	
+	aux := upcase(cadena[1]);
+
 	case aux of
 		'A':
 			NombreContinente := 'America';
-		
+
 		'F':
 			NombreContinente := 'Africa';
-		
+
 		'E':
 			NombreContinente := 'Europa';
-			
+
 		'S':
 			NombreContinente := 'Asia';
-		
+
 		'O':
 			NombreContinente := 'Oceania';
-			
-		otherwise
+
+		else
 			NombreContinente := 'NoCont';
 	end;
 end;
 
-{pre-condicion: Tener las listas con datos de CrearIndices}
-{post-condicion: Busca en las listas que contienen todas las especies en extincion
-				 los animales que no estan en el Zoologico de Buenos Aires}
-procedure Proceso( var arch: TA_ZooOut;
+procedure CrearReporte( var arch: TA_ZooOut;
 				   var vector: TVec_CodEspExt;
 				   var lista: TL_Esp;
 				   var cantElem: byte );
-				   
+{pre-condicion: Lista y vector inicializados y cargados.}
+{post-condicion: Busca en las listas que contienen todas las especies en extincion
+				 los animales que no estan en el Zoologico de Buenos Aires}				   
 var
 	ptrCursorEsp: TN_Esp;
 	ptrCursorZoo: TN_Zoo;
 	
 begin
 	rewrite( arch );
-	ptrCursorEsp := Primero( lista );
+	ptrCursorEsp := PrimeroEsp( lista );
 	
-	writeln( arch, ' ':15, 'Faltantes de especies en EXTINCION del Zoologico de la Ciudad de Bs. As.', NuevaLinea() );
+	writeln( arch, ' ':15, 'Faltantes de especies en EXTINCION del Zoologico de la Ciudad de Bs. As.', NuevaLinea );
 	
 	while ptrCursorEsp <> nil do
 	begin
@@ -389,13 +422,13 @@ begin
 		begin
 			ImprimirEncabezado( ptrCursorEsp^.CodEsp, arch );
 			
-			ptrCursorZoo := Primero( ptrCursorEsp^.ListaZoo );
+			ptrCursorZoo := PrimeroZoo( ptrCursorEsp^.ListaZoo );
 			
 			while ptrCursorZoo <> nil do
 			begin
 				writeln( arch, ' ': 15, ptrCursorZoo^.CodZoo, ' ': 40, NombreContinente(  ptrCursorZoo^.CodZoo ) );				
 				
-				ptrCursorZoo := Siguiente( ptrCursorZoo, ptrCursorEsp^.ListaZoo );
+				ptrCursorZoo := SiguienteZoo( ptrCursorZoo, ptrCursorEsp^.ListaZoo );
 			end;
 			
 		end;
@@ -419,11 +452,15 @@ var
 begin
 	assign( Archivo, RutaArchivo );
 	assign( ArchivoSalida, RutaArchivoSalida );
-	
+
 	InicializarVariables( CantElem );
-	CrearIndices( Archivo, VectorEsp, ListaEsp, CantElem );
-		
-	Proceso( ArchivoSalida, VectorEsp, ListaEsp, CantElem );
-	
+	InicializarListaEsp( ListaEsp );
+
+	ProcesarArchivo( Archivo, VectorEsp, ListaEsp, CantElem );
+
+	CrearReporte( ArchivoSalida, VectorEsp, ListaEsp, CantElem );
+
 	writeln( '*** Fin del Programa ***' );
 end.
+
+
